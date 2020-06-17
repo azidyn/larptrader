@@ -1,11 +1,19 @@
 
 
 // Simple simulated trading module for backtesting
+// Allows you to create simulated paper trades 
 
 class Backtester
 {
     constructor() {
 
+        this.fees = {
+            on: true,
+            taker: 0.075 / 100,         // BitMEX taker fees = 0.075%
+            maker: 0.025 / 100,         // 
+            side: 'makertaker'          // 'makertaker': one of each, 'maker': limit orders both sides, 'taker': market orders both sides
+        };
+        
         this.stopped = false;
         this.closed =  false;
         this.lost = false;
@@ -29,12 +37,16 @@ class Backtester
 
         this.dailytrades++;
 
+        // Close any open trades
+        if ( this.trade )
+            this._close_position( price, timestamp, false );
+
         this.trade = {
             side: side,
             entry: price,
             stop: stop,
             risk: risk,
-            size: this._size_by_stop_risk( risk, price, stop ),
+            size: stop ? this._size_by_stop_risk( risk, price, stop ) : ( this. balance * ( risk / 100 ) ) ,
             opentimestamp: timestamp,
             closetimestamp: null,
             result: { },
@@ -88,12 +100,12 @@ class Backtester
         }
 
         this.stopped = false;
-        this.closed =  false;
+        this.closed = false;
         this.lost = false;
         this.won = false;
         this.even = false;
-        
-        if ( !this.trade || !this.trade.stop )  // FIXME: stop is required
+            
+        if ( !this.trade || !this.trade.stop )  
             return;
         
         if ( this.trade.side == 'long' )

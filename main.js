@@ -38,6 +38,9 @@ function onclose( bar, series )
         Do not trade this unless you insist on being poor.
 
     */
+
+
+    
     
     // Get the previous bar
     let prevbar = prev( series, 1 );
@@ -49,12 +52,20 @@ function onclose( bar, series )
     let sma60 = sma.nextValue( bar.close );
 
     // If price crossing down the 60 SMA, short
-    if ( prevbar.close >= sma60 && bar.close < sma60 )
+    if ( prevbar.close >= sma60 && bar.close < sma60 ) {
         console.log( `${ bar.closetimestamp} SHORT | ${bar.close}` );
+        larp.open( 'short', bar.close, null, 100, bar.closetimestamp );
+
+        console.log( larp.lasttrade );
+    }
 
     // If price crossing up the 60 SMA, long
-    if ( prevbar.close < sma60 && bar.close >= sma60 )
+    if ( prevbar.close < sma60 && bar.close >= sma60 ) {
         console.log( `${ bar.closetimestamp}  LONG | ${bar.close}` );
+        larp.open( 'long', bar.close, null, 100, bar.closetimestamp );
+
+        console.log( larp.lasttrade );
+    }
         
 
 }
