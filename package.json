@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "node-fetch": "^2.6.0",
-    "present": "^1.0.0"
+    "present": "^1.0.0",
+    "technicalindicators": "^3.1.0"
   }
 }
