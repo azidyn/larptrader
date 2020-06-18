@@ -1,6 +1,5 @@
 
 const LiveFeed      = require('./src/feed/Live');
-const DiskFeed      = require('./src/feed/Offline');
 const Backtester    = require('./src/Backtester');
 const fs            = require('fs');
 const Indicators    = require('technicalindicators');
@@ -17,8 +16,12 @@ const HISTORICAL_BARS = 1000;           // how many bars to download before runn
 
 
 const feed = new LiveFeed();
-// const feed = new DiskFeed( `${__dirname}/bars5m.json` );
+
+// 
 const larp = new Backtester();
+
+larp.fees.on = true;
+larp.fees.side = 'makertaker';
 
 let series = [];
 
@@ -51,7 +54,9 @@ function onclose( bar, series )
     // If price crossing down the 60 SMA, short
     if ( prevbar.close >= sma60 && bar.close < sma60 ) {
 
-        console.log( `${ bar.closetimestamp} SHORT | ${bar.close}` );
+        if ( bar.live )
+            console.log( `(live) ${ bar.closetimestamp} SHORT | ${bar.close}` );
+
         larp.open( 'short', bar.close, null, 100, bar.closetimestamp );
 
     }
@@ -59,13 +64,15 @@ function onclose( bar, series )
     // If price crossing up the 60 SMA, long
     if ( prevbar.close < sma60 && bar.close >= sma60 ) {
 
-        console.log( `${ bar.closetimestamp}  LONG | ${bar.close}` );
+        if ( bar.live) 
+            console.log( `(live) ${ bar.closetimestamp}  LONG | ${bar.close}` );
+
         larp.open( 'long', bar.close, null, 100, bar.closetimestamp );
 
     }
  
     if ( larp.closed ) 
-        console.log( larp.lasttrade );
+        console.log( `=> ${larp.lasttrade.side} result [ ${larp.won ? 'won' : (larp.lost ? 'lost' : 'even')} ] ${larp.lasttrade.result.percent.toFixed(2)}% | Balance: ${larp.balance} XBT` );
     
 
 }

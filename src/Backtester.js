@@ -96,7 +96,6 @@ class Backtester
 
             }
 
-
         }
 
         this.stopped = false;
@@ -149,6 +148,7 @@ class Backtester
             stopped: stopped,
             exit: this.trade.exit,
             profit: pnl,
+            percent: percent( startbal, this.balance ),
             balance: { before: startbal, after: this.balance }
         }
 
@@ -181,6 +181,6 @@ const sameday = (first, second) =>
     first.getUTCMonth() === second.getUTCMonth() &&
     first.getUTCDate() === second.getUTCDate();
 
-
+const percent = ( from, to ) => ((to - from) / from) * 100;
 
 module.exports = Backtester;
