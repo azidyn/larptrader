@@ -40,7 +40,7 @@ async function onclose( bar ) { // <== Note this function needs to be declaredd 
     let flat = bar.close == bar.open;
 
     // !!!!!!!!!!!!! IMPORTANT !!!!!!!!!!!!!
-    // Make sure bar.live == true before trying to place orders otherwise the historical data will be traded 
+    // Make sure bar.live == true before trying to place orders otherwise the historical signals will be traded 
     // and BitMEX will ban your account for placing too many orders
 
     if ( bar.live && TRADE_LIVE  ) {
