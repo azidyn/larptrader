@@ -23,6 +23,8 @@ class DiskFeed extends EventEmitter
         for ( let bar of bars )
             this.emit( 'bar', bar );
 
+        this.emit('terminate');
+
     }
 
 

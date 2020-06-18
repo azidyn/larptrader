@@ -21,6 +21,7 @@ class Backtester
         this.even = false;
 
         this.balance = 1;
+        this.startbalance = this.balance;
         this.trade = null;
         this.trades = [];
 
@@ -30,6 +31,10 @@ class Backtester
         this.dailyeven = 0;
 
         this.lastbardate = null;
+
+        this.totalwon = 0;
+        this.totallost = 0;
+        this.totaleven = 0;
 
     }
 
@@ -52,6 +57,20 @@ class Backtester
             result: { },
             meta: { }
         };
+
+    }
+
+    get result () {
+
+        return {
+            trades: this.trades.length,
+            strikerate: `${( (this.totalwon / this.trades.length) * 100 ).toFixed(2)}%`,
+            balance: this.balance,
+            growth: `${percent( this.startbalance, this.balance ).toFixed(2)}%`,
+            won: this.totalwon,
+            lost: this.totallost,
+            even: this.totaleven,
+        }
 
     }
 
@@ -130,6 +149,24 @@ class Backtester
         this.trade.exit = price;
 
         let pnl = this._calc_pnl_xbt( this.trade.side, this.trade.entry, this.trade.exit, this.trade.size );
+
+        if ( this.fees.on ) {
+
+            switch( this.fees.mode ) {
+
+                case 'taker': 
+                    pnl -= this.trade.size * this.fees.taker * 2;
+                    break;
+                case 'maker': 
+                    pnl += this.trade.size * this.fees.maker * 2;
+                    break;
+                case 'makertaker': 
+                    pnl -= this.trade.size * this.fees.taker;
+                    pnl += this.trade.size * this.fees.maker;
+                    break;
+            }
+
+        }
         
         let startbal = this.balance;
 
@@ -141,9 +178,9 @@ class Backtester
         this.lost = pnl < 0;
         this.even = pnl == 0;
 
-        if ( this.won ) this.dailywon++;
-        if ( this.lost ) this.dailylost++;
-        if ( this.even ) this.dailyeven++;
+        if ( this.won )  { this.dailywon++;  this.totalwon++; }
+        if ( this.lost ) { this.dailylost++; this.totallost++; }
+        if ( this.even ) { this.dailyeven++; this.totaleven++; }
 
         this.trade.result = {
             stopped: stopped,

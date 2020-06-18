@@ -1,5 +1,15 @@
 
-const LiveFeed      = require('./src/feed/Live');
+/*
+    Pretty much exactly the same as `example_live_strategy_ma_cross.js` except uses historical 
+    offline data from a file instead of pulling directly from the exchange.
+    Oh and uses daily bars with an MA30 instead.
+
+*/
+
+
+
+// const LiveFeed      = require('./src/feed/Live');
+const DiskFeed      = require('./src/feed/Offline');
 const Backtester    = require('./src/Backtester');
 const fs            = require('fs');
 const Indicators    = require('technicalindicators');
@@ -7,13 +17,20 @@ const Indicators    = require('technicalindicators');
 const MAX_HISTORICAL_BARS = 1000;
 
 // Settings for your backtest/trading
-const RESOLUTION = '1h';                // '1m', '5m', '1h', '1d'
+const RESOLUTION = '1d';                // '1m', '5m', '1h', '1d'
 const RUN_LIVE = true;                 // enable live trading or not
 const HISTORICAL_BARS = 1000;           // how many bars to download before running live/backtest (max 1000)
 
+// Daily bars
+const filename = __dirname + '/data/XBTUSD-1d.json';
+
+if ( !fs.existsSync( filename ) ) {
+    console.log(`\nERROR: File missing ${filename}.\nGo to ./data/ folder and run: node scrape 1d 1000 XBTUSD\n`);
+    process.exit(1);
+}
 
 // Data
-const feed = new LiveFeed();
+const feed = new DiskFeed( filename );
 
 // 'Backtest' the incoming data, can be used for Live or Offline bars
 const larp = new Backtester();
@@ -23,9 +40,8 @@ larp.fees.mode = 'makertaker';
 
 let series = [];
 
-// Simple moving average, length/period of 10 
-let sma = new (Indicators['SMA'])({ period: 60, values: [] }) ;
-
+// Simple moving average, length/period of 30
+let sma = new (Indicators['SMA'])({ period: 30, values: [] }) ;
 
 // Helper to get the `index`th element of an array counting backwards from the final element 
 // e.g. prev( arr, 0 ) gets the last element of arr[] instead of the first 
@@ -49,13 +65,13 @@ function onclose( bar, series )
     let prevbar = prev( series, 1 );
 
     // Get the simple moving avg value for this bar's close
-    let sma60 = sma.nextValue( bar.close );
+    let sma30 = sma.nextValue( bar.close );
 
     if ( !prevbar )
         return;
 
     // If price crossing down the 60 SMA, short
-    if ( prevbar.close >= sma60 && bar.close < sma60 ) {
+    if ( prevbar.close >= sma30 && bar.close < sma30 ) {
 
         if ( bar.live )
             console.log( `(live) ${ bar.closetimestamp} SHORT | ${bar.close}` );
@@ -66,7 +82,7 @@ function onclose( bar, series )
     }
 
     // If price crossing up the 60 SMA, long
-    if ( prevbar.close < sma60 && bar.close >= sma60 ) {
+    if ( prevbar.close < sma30 && bar.close >= sma30 ) {
 
         if ( bar.live) 
             console.log( `(live) ${ bar.closetimestamp}  LONG | ${bar.close}` );
@@ -76,7 +92,7 @@ function onclose( bar, series )
     }
  
     if ( larp.closed ) 
-        console.log( `=> ${larp.lasttrade.side} [ ${larp.won ? 'won' : (larp.lost ? 'lost' : 'even')} ] ${larp.lasttrade.result.percent.toFixed(2)}% | Balance: ${larp.balance} XBT` );
+        console.log( `${bar.closetimestamp} => ${larp.lasttrade.side} \t[ ${larp.won ? 'won' : (larp.lost ? 'lost' : 'even')} ] \t${larp.lasttrade.result.percent.toFixed(2)}% | Balance: ${larp.balance} XBT` );
     
 
 }
@@ -87,7 +103,12 @@ function onclose( bar, series )
 
     feed.on('terminate', b => {
 
-        console.log('Terminated. Change    RUN_LIVE = true    to continue waiting for new data.');
+        console.log('Finished. Result: ');
+
+        console.log( larp.result )
+
+        // Uncomment below to see all the trades
+        // console.log( larp.trades )
 
     });
 
