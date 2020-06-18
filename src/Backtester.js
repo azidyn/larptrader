@@ -100,10 +100,10 @@ class Backtester
     // Check for stop outs etc.
     update( bar )  {
 
+        let d = new Date( Date.parse( bar.opentimestamp ) );
+
         // Test if this is new day to reset intraday statistics
         if ( this.lastbardate ) {
-
-            let d = new Date( Date.parse( bar.opentimestamp ) );
 
             if ( !sameday( this.lastbardate, d )) {
 
@@ -111,12 +111,11 @@ class Backtester
                 this.dailylost = 0;
                 this.dailytrades = 0;
                 this.dailyeven = 0;
-
-                this.lastbardate = d;
-
             }
 
         }
+
+        this.lastbardate = d;
 
         this.stopped = false;
         this.closed = false;
