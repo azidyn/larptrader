@@ -1,7 +1,7 @@
 
 /*
 
-    example-indicators.js
+    example-live-indicators.js
 
     Pulls a bunch of historical data and sits waiting for new bars
     applying the indicators and displaying their output throughout.
@@ -16,7 +16,7 @@ const Indicators    = require('technicalindicators');
 
 
 // Settings for your backtest/trading
-const RESOLUTION = '5m';               // '1m', '5m', '1h', '1d'
+const RESOLUTION = '1h';               // '1m', '5m', '1h', '1d'
 const RUN_LIVE = true;                 // enable live feed or not (system waits for each new bar)
 const HISTORICAL_BARS = 100;            // how many bars to download before running live/backtest (max 1000)
 const MAX_HISTORICAL_BARS = 1000;
@@ -29,7 +29,9 @@ console.log(`Pulling the last ${HISTORICAL_BARS} bars and then waiting for new d
 
 // Simple moving average, length/period of 10 
 let sma = new (Indicators['SMA'])({ period: 60, values: [] }) ;
+let rsi = new (Indicators['RSI'])({ period: 14, values: [] }) ;
 
+console.log(Indicators.AvailableIndicators)
 
 function onclose( bar )
 {
