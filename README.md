@@ -15,7 +15,7 @@ Have fun. Get rich, kid.
 - No database required
 - Almost zero configuration ( `config.js` requires a testnet API key to trade on BitMEX )
 - Backtester calculates fees (optional), inverse contract PnL math, and sizes position by stop/risk.
-- Simple architecture, easy to fork and your own ideas or pull in other types of data
+- Simple architecture, easy to fork add your own ideas or pull in other types of data
 - Can backtest a strategy using offline or historical data. And then continue running immediately so you can forward test it too.
 
 ### Installation
@@ -38,7 +38,7 @@ Description of behaviour inside the source file.
 
 ### Scraping data
 
-Some the examples require offline data to be scraped first, to do this there is a script inside the `/data` folder, read the README.md file there, it's pretty easy and quick to use.
+Some of the examples require offline data to be scraped first, to do this there is a script inside the `/data` folder, read the README.md file there, it's pretty easy and quick to use.
 
 ### Indicators
 **Larptrader** uses this great TA library: https://github.com/anandanand84/technicalindicators
