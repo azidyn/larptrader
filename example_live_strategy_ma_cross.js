@@ -72,7 +72,7 @@ function onclose( bar, series )
     }
  
     if ( larp.closed ) 
-        console.log( `=> ${larp.lasttrade.side} result [ ${larp.won ? 'won' : (larp.lost ? 'lost' : 'even')} ] ${larp.lasttrade.result.percent.toFixed(2)}% | Balance: ${larp.balance} XBT` );
+        console.log( `=> ${larp.lasttrade.side} [ ${larp.won ? 'won' : (larp.lost ? 'lost' : 'even')} ] ${larp.lasttrade.result.percent.toFixed(2)}% | Balance: ${larp.balance} XBT` );
     
 
 }

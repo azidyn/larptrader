@@ -1,7 +1,7 @@
 
 
 // Simple simulated trading module for backtesting
-// Allows you to create simulated paper trades 
+// Allows to place simulated paper trades and calculate bitmex inverse contract pnl
 
 class Backtester
 {
@@ -72,6 +72,7 @@ class Backtester
 
         if ( this.trade && this.trade.side == 'long' )
             this.trade.stop = Math.max( this.trade.stop, price );
+
         else if ( this.trade && this.trade.side == 'short' )
             this.trade.stop = Math.min( this.trade.stop, price );
             
@@ -80,7 +81,7 @@ class Backtester
     // Check for stop outs etc.
     update( bar )  {
 
-        // Test if this is new day or not to reset intraday statistics
+        // Test if this is new day to reset intraday statistics
         if ( this.lastbardate ) {
 
             let d = new Date( Date.parse( bar.opentimestamp ) );

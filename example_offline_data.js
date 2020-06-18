@@ -4,7 +4,7 @@
 //  
 // First requires generation of bar data file go to ./data/ folder and run: node scrape 1h 14 XBTUSD
 //
-// See scrape.js for more instructions, probably
+// See data/README.md for more instructions, probably
 // 
 // ******************************
 

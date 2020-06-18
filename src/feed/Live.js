@@ -15,12 +15,12 @@ const BITMEX_BINS = {
     '1d': 24 * 60 * 1000 * 60
 };
 
-const LATENCY = 0;
+const LATENCY = 250;
 const DEF_RESOLUTION = 5 * 1000 * 60;
 const DEF_QUARTER_RES = DEF_RESOLUTION >> 2;
 const DEF_BIN = '5m';
 const DEF_SYMBOL = 'XBTUSD';
-
+const LAG_WARNING = false;
 const MAX_TRADES = 200; 
 const TRADE_COLS = JSON.stringify(["timestamp","size", "price"]);
 const API_URL = 'https://www.bitmex.com/api/v1/';
@@ -131,7 +131,7 @@ class Feed extends EventEmitter
 
         let n = Date.now();
 
-        if ( n > this.opentime + this.resolution ) {
+        if ( LAG_WARNING && n > this.opentime + this.resolution ) {
             console.warn(`Warning: poll is lagging by ${n - ( this.opentime + this.resolution )}ms`)
         }
         

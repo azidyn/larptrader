@@ -1,15 +1,18 @@
 
+const fs            = require('fs');
 const LiveFeed      = require('./src/feed/Live');
 
 // Settings for your backtest/trading
-const RESOLUTION = '1m';               // '1m', '5m', '1h', '1d'
+const RESOLUTION = '5m';               // '1m', '5m', '1h', '1d'
 const RUN_LIVE = true;                 // enable live trading or not (system waits for each new bar)
 const HISTORICAL_BARS = 10;            // how many bars to download before running live/backtest (max 1000)
+const MAX_HISTORICAL_BARS = 1000;
 
 const feed = new LiveFeed();
 
-console.log(`Pulling the last ${HISTORICAL_BARS} bars and then waiting for new data. Press CTRL+C to terminate.`);
+let series = [];
 
+console.log(`Pulling the last ${HISTORICAL_BARS} bars and then waiting for new data. Press CTRL+C to terminate.`);
 
 
 function onclose( bar )
@@ -34,6 +37,13 @@ function onclose( bar )
 (async()=>{
 
     feed.on('bar', b => {
+
+        series.push( b );
+
+        // Limit memory usage 
+        series = series.slice( -MAX_HISTORICAL_BARS );
+
+        fs.writeFileSync( './bars5m.json', JSON.stringify( series ) );
 
         // Call the user strategy code
         onclose( b );
