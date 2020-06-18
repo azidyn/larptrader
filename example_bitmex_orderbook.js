@@ -1,6 +1,6 @@
 
 
-const BitMEX = require('./BitMEX');
+const BitMEX = require('./exchange/BitMEX');
 const config = require('./config');
 
 if ( !config.key.testnet.id )
