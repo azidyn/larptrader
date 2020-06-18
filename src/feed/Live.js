@@ -21,7 +21,6 @@ const DEF_QUARTER_RES = DEF_RESOLUTION >> 2;
 const DEF_BIN = '5m';
 const DEF_SYMBOL = 'XBTUSD';
 
-// const LATENCY = 250;   // ... naughty naughty.
 const MAX_TRADES = 200; 
 const TRADE_COLS = JSON.stringify(["timestamp","size", "price"]);
 const API_URL = 'https://www.bitmex.com/api/v1/';
