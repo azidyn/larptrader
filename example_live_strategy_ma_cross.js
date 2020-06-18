@@ -84,6 +84,8 @@ function onclose( bar, series )
 // Required system bootup boilerplate code 
 (async()=>{
 
+    feed.on('live', () => console.log('* Running live. Waiting for the current bar to close.') );
+    
     feed.on('terminate', b => {
 
         console.log('Terminated. Change    RUN_LIVE = true    to continue waiting for new data.');

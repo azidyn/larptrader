@@ -12,6 +12,7 @@
 
 const fs            = require('fs');
 const LiveFeed      = require('./src/feed/Live');
+// const DiskFeed      = require('./src/feed/Offline');
 const Indicators    = require('technicalindicators');
 
 
@@ -21,17 +22,24 @@ const RUN_LIVE = true;                 // enable live feed or not (system waits 
 const HISTORICAL_BARS = 100;            // how many bars to download before running live/backtest (max 1000)
 const MAX_HISTORICAL_BARS = 1000;
 
+// const feed = new DiskFeed(__dirname+'/data/XBTUSD-1d.json');
+const dp = value => value ? Number( value.toFixed(2) ) : null;
+
 const feed = new LiveFeed();
 
 let series = [];
 
 console.log(`Pulling the last ${HISTORICAL_BARS} bars and then waiting for new data. Press CTRL+C to terminate.`);
 
-// Simple moving average, length/period of 10 
-let sma = new (Indicators['SMA'])({ period: 60, values: [] }) ;
-let rsi = new (Indicators['RSI'])({ period: 14, values: [] }) ;
+// From here: https://github.com/anandanand84/technicalindicators
+// Uncomment to see available indicators:
+// console.log(Indicators.AvailableIndicators);
 
-console.log(Indicators.AvailableIndicators)
+let SMA = new (Indicators['SMA'])({ period: 30, values: [] }) ;
+let RSI = new (Indicators['RSI'])({ period: 14, values: [] }) ;
+let ATR = new (Indicators['ATR'])({ period: 14, high: [], low: [], close: [] }) ;
+let BBANDS = new (Indicators['BollingerBands'])({ period: 14, stdDev: 2, values: [] }) ;
+
 
 function onclose( bar )
 {
@@ -42,7 +50,13 @@ function onclose( bar )
     *
     */
     
-    console.log( `${ bar.live ? 'LIVE => ' :'' }${bar.opentimestamp} open=${bar.open} high=${bar.high} low=${bar.low} close=${bar.close}`);
+    let atr = ATR.nextValue({ high: bar.high, low: bar.low, close: bar.close });
+    let rsi = RSI.nextValue( bar.close )
+    let sma = SMA.nextValue( bar.close );
+    let bbands = BBANDS.nextValue( bar.close ) || {};
+
+    console.log(`${bar.closetimestamp} | close=${bar.close} atr=${dp(atr)} rsi=${dp(rsi)} sma30=${dp(sma)} bbands_up=${dp(bbands.upper)} bbands_low=${dp(bbands.lower)} bbands_mid=${dp(bbands.middle)}`)
+
 
 }
 
@@ -53,6 +67,8 @@ function onclose( bar )
 
 // Required system bootup boilerplate code 
 (async()=>{
+
+    feed.on('live', () => console.log('* Running live. Waiting for the current bar to close.') );
 
     feed.on('bar', b => {
 
@@ -73,3 +89,5 @@ function onclose( bar )
 
     
 })();
+
+

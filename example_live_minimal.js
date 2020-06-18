@@ -46,6 +46,8 @@ function onclose( bar )
 // Required system bootup boilerplate code 
 (async()=>{
 
+    feed.on('live', () => console.log('* Running live. Waiting for the current bar to close.') );
+
     feed.on('bar', b => {
 
         series.push( b );

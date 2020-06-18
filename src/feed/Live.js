@@ -115,6 +115,8 @@ class Feed extends EventEmitter
 
                 this.emit( 'bar', w );
             }
+
+            this.emit('live');
         
         }
 
