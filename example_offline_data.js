@@ -1,12 +1,17 @@
 
 
-// ********* ATTENTION *********
-//  
-// First requires generation of bar data file go to ./data/ folder and run: node scrape 1h 14 XBTUSD
-//
-// See data/README.md for more instructions, probably
-// 
-// ******************************
+/*
+
+    example-offline-data.js
+
+    ********* ATTENTION *********
+
+    First requires generation of bar data file go to ./data/ folder and run: node scrape 1d 1000 XBTUSD
+
+    *****************************
+
+
+*/
 
 
 // Offline feed of bars
@@ -26,6 +31,7 @@ try {
 function onclose( bar )
 {
 
+    // Just show the bar data
     console.log( bar );
 
 }

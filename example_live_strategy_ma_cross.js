@@ -1,14 +1,13 @@
 
 const LiveFeed      = require('./src/feed/Live');
 const Backtester    = require('./src/Backtester');
-const fs            = require('fs');
 const Indicators    = require('technicalindicators');
 
 const MAX_HISTORICAL_BARS = 1000;
 
 // Settings for your backtest/trading
 const RESOLUTION = '1h';                // '1m', '5m', '1h', '1d'
-const RUN_LIVE = true;                 // enable live trading or not
+const RUN_LIVE = true;                  // enable live feed 
 const HISTORICAL_BARS = 1000;           // how many bars to download before running live/backtest (max 1000)
 
 
@@ -76,7 +75,7 @@ function onclose( bar, series )
     }
  
     if ( larp.closed ) 
-        console.log( `=> ${larp.lasttrade.side} [ ${larp.won ? 'won' : (larp.lost ? 'lost' : 'even')} ] ${larp.lasttrade.result.percent.toFixed(2)}% | Balance: ${larp.balance} XBT` );
+        console.log( `${bar.closetimestamp} => ${larp.lasttrade.side} [ ${larp.won ? 'won' : (larp.lost ? 'lost' : 'even')} ] ${larp.lasttrade.result.percent.toFixed(2)}% | Balance: ${larp.balance} XBT` );
     
 
 }

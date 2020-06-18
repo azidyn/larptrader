@@ -1,21 +1,24 @@
 
 /*
 
-    example-live-minimal.js
+    example-indicators.js
 
-    Pulls the last 10 bars of historical data from BitMEX and then sits waiting for new bars
-    Prints them out to the console.
+    Pulls a bunch of historical data and sits waiting for new bars
+    applying the indicators and displaying their output throughout.
+
 
 */
 
 
 const fs            = require('fs');
 const LiveFeed      = require('./src/feed/Live');
+const Indicators    = require('technicalindicators');
+
 
 // Settings for your backtest/trading
 const RESOLUTION = '5m';               // '1m', '5m', '1h', '1d'
 const RUN_LIVE = true;                 // enable live feed or not (system waits for each new bar)
-const HISTORICAL_BARS = 10;            // how many bars to download before running live/backtest (max 1000)
+const HISTORICAL_BARS = 100;            // how many bars to download before running live/backtest (max 1000)
 const MAX_HISTORICAL_BARS = 1000;
 
 const feed = new LiveFeed();
@@ -23,6 +26,9 @@ const feed = new LiveFeed();
 let series = [];
 
 console.log(`Pulling the last ${HISTORICAL_BARS} bars and then waiting for new data. Press CTRL+C to terminate.`);
+
+// Simple moving average, length/period of 10 
+let sma = new (Indicators['SMA'])({ period: 60, values: [] }) ;
 
 
 function onclose( bar )
@@ -52,9 +58,6 @@ function onclose( bar )
 
         // Limit memory usage 
         series = series.slice( -MAX_HISTORICAL_BARS );
-
-        // Write incoming data to disk if you wish
-        //fs.writeFileSync( './bars.json', JSON.stringify( series ) );
 
         // Call the user strategy code
         onclose( b );

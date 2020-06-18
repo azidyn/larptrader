@@ -1,11 +1,11 @@
 
+
 /*
     Pretty much exactly the same as `example_live_strategy_ma_cross.js` except uses historical 
     offline data from a file instead of pulling directly from the exchange.
     Oh and uses daily bars with an MA30 instead.
 
 */
-
 
 
 // const LiveFeed      = require('./src/feed/Live');
