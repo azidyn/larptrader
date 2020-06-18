@@ -7,7 +7,6 @@
 */
 
 
-
 const BitMEX = require('./src/exchange/BitMEX');
 const config = require('./config');
 
