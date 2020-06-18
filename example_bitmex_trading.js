@@ -1,11 +1,13 @@
 
 /*
 
-    example-trading.js
+    example_bitmex_trading.js
 
     Shows how to execute a trade on BitMEX
 
-    Do *** N O T *** use on anything but a testnet account with 1 contract.
+    Note that the bar feed comes from the real/live BitMEX not testnet
+
+    Do *** N O T *** trade this on anything but a testnet account with 1 contract.
 
 */
 
@@ -31,19 +33,16 @@ const bitmex = new BitMEX({ livenet: false, id: config.key.testnet.id, secret: c
 
 let series = [];
 
-console.log(`Pulling the last ${HISTORICAL_BARS} bars and then waiting for new data. Press CTRL+C to terminate.`);
-
-
-async function onclose( bar ) // <== Note this function needs to be declaredd async to trade on the exchange
-{
+async function onclose( bar ) { // <== Note this function needs to be declaredd async to trade on the exchange
 
     let green = bar.close > bar.open;
     let red = bar.close < bar.open;
     let flat = bar.close == bar.open;
 
-    // !!! IMPORTANT !!!
+    // !!!!!!!!!!!!! IMPORTANT !!!!!!!!!!!!!
     // Make sure bar.live == true before trying to place orders otherwise the historical data will be traded 
     // and BitMEX will ban your account for placing too many orders
+
     if ( bar.live && TRADE_LIVE  ) {
 
         // Long every green bar
@@ -84,7 +83,7 @@ async function onclose( bar ) // <== Note this function needs to be declaredd as
 // Required system bootup boilerplate code 
 (async()=>{
 
-    feed.on('live', () => console.log('* Running live. Waiting for the current bar to close.') );
+    feed.on('live', () => console.log('* Running live. Waiting for the current bar to close. Press CTRL+C to terminate.') );
 
     feed.on('bar', async b => {
 
