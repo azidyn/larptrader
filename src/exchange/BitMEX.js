@@ -1,11 +1,16 @@
 
-
 const crypto = require('crypto');
 const fetch = require('node-fetch');
 
+const XBt_TO_XBT = 1 / 100000000;
+
 /*
-  
- To help improve responsiveness during high-load periods, the BitMEX trading engine will begin load-shedding when requests reach a 
+
+  Note this module is pretty old and should be restructured. 
+
+
+
+To help improve responsiveness during high-load periods, the BitMEX trading engine will begin load-shedding when requests reach a 
   critical queue depth. When this happens, you will quickly receive a 503 status code with the 
   JSON payload {"error": {"message": "The system is currently overloaded. Please try again later.", "name": "HTTPError"}}. 
   The request will not have reached the engine, and you should retry after at least 500 milliseconds.
@@ -20,10 +25,9 @@ class BitMEXRest
 {
   constructor( opts )
   {
-    this.config = opts.config;
     this.url = opts.livenet ? 'https://www.bitmex.com' : 'https://testnet.bitmex.com';
     
-    this.key = opts.key;
+    this.key = opts.id;
     this.secret = opts.secret;
     
   }
@@ -73,7 +77,7 @@ class BitMEXRest
     let i = symbol == 'XBTUSD' ? 'xbt' : symbol;
     let balance = await this.balance();
     let ins = await this.instrument(i);
-    let xbt = (balance.availableMargin * this.config.XBt_TO_XBT) * pcbalance;
+    let xbt = (balance.availableMargin * XBt_TO_XBT) * pcbalance;
 
     let usd = xbt * ins.lastPrice;
     let num = (((usd - (usd % ROUND_USD)) * leverage)) <<0;
@@ -160,47 +164,6 @@ class BitMEXRest
 
   }
 
-  async amend( orderID,origClOrdID, opts={} )
-  {
-
-    // FIXME: can't get this working! bitmex bug?
-
-    let body = {
-      origClOrdID: origClOrdID,
-      orderID: orderID,
-      orderQty: 9,
-      price: 10101.5
-    };
-
-    Object.assign( body, opts );
-
-
-    let bulk = {
-      orders: [ body ]
-    };
-
-    console.log( bulk )
-
-    let verb    = 'PUT`';
-    let path    = `${API_PATH}/order/bulk`;
-    let sbody   = JSON.stringify( bulk )
-    let url     = `${this.url}${path}`;
-
-    console.log( path )
-    console.log( sbody )
-    console.log( url )
-
-    const req = {
-      headers: this._header( verb, path, 0, sbody ),      
-      method: verb,
-      body: sbody
-    };
-    
-    let res = await fetch( url, req )
-
-    return await this.handle_response( res );
-
-  }
 
   async marketclose( symbol, opts={}  )
   {
@@ -430,6 +393,46 @@ class BitMEXRest
 
 
 
+  // async position(symbol, action, params)
+  // {
+  //   let body = {};
+  //   switch(action)
+  //   {
+  //     case 'close':
+  //       body = {symbol:symbol, execInst:'Close', ordType:"Market"};
+  //       break;
+  //     case 'open':
+  //       body = {symbol:symbol, ordType:'Market'};
+  //       Object.assign(body, params);
+  //       break;
+  //     case 'get':
+  //       return await this._get_position(symbol);
+  //       break;
+
+  //   }
+
+  //   let verb = 'POST';
+  //   let path = `${API_PATH}/order`;
+
+  //   let sbody = JSON.stringify(body)
+
+  //   const req = {
+  //     headers: this._header(verb, path, 0, sbody),
+  //     url:`${this.url}${path}`,
+  //     method: verb,
+  //     body: sbody
+  //   };
+
+  //   let res = await request(req);
+  //   let o = JSON.parse(res);
+  //   if (Array.isArray(o))
+  //     if (o.length == 1)
+  //       o = o[0]
+  //     else if (o.length == 0) o = {error: `Nothing returned for ${symbol}`}
+
+  //   return o;
+  // }
+
   async position( sym )
   {
     let f = {
@@ -512,8 +515,7 @@ class BitMEXRest
     let rateLimit = res.headers.get('x-ratelimit-remaining');
 
     if ( Array.isArray( o ) )
-      if (o.length == 1) o = o[0]
-      // else if (o.length == 0) o = { error: `Nothing returned` } // why do we need this?
+      if (o.length == 1) o = o[0];      
 
     if ( !Array.isArray( o ))
       o.__META__RATELIMIT = rateLimit;
