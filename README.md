@@ -39,6 +39,7 @@ Description of behaviour inside all the source file.
 ### Scraping data
 
 Some of the examples require offline data to be scraped first, to do this there is a script inside the `/data` folder, read the README.md file there, it's pretty easy and quick to use.
+Note: You may want to scrape and store data if you're running lots of backtests, instead of pulling live from the exchange each time. Otherwise Arthur will get you.
 
 ### Indicators
 **Larptrader** uses this great TA library: https://github.com/anandanand84/technicalindicators
