@@ -54,13 +54,6 @@ const prev = ( array, index ) => array.length ? array[ (array.length - 1) - inde
 // `series`:    list of all bars we've received, including the most recent one
 function onclose( bar, series )
 {
-    /*
-        
-        Absolutely terrible trading strategy based on simple moving average cross
-        Do not trade this unless you insist on being poor.
-
-    */
-
     // Get the previous bar
     let prevbar = prev( series, 1 );
 
@@ -70,7 +63,7 @@ function onclose( bar, series )
     if ( !prevbar )
         return;
 
-    // If price crossing down the 60 SMA, short
+    // If daily bar crossing down the 30 SMA, short
     if ( prevbar.close >= sma30 && bar.close < sma30 ) {
 
         if ( bar.live )
@@ -81,7 +74,7 @@ function onclose( bar, series )
 
     }
 
-    // If price crossing up the 60 SMA, long
+    // If daily bar crossing up the 30 SMA, long
     if ( prevbar.close < sma30 && bar.close >= sma30 ) {
 
         if ( bar.live) 
