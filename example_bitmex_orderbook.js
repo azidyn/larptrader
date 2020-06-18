@@ -3,6 +3,10 @@
 const BitMEX = require('./BitMEX');
 const config = require('./config');
 
+if ( !config.key.testnet.id )
+    console.warn(`No API key set in config.js`);
+
+// Note: you don't need a key for some bitmex functions
 let bitmex = new BitMEX({ livenet: false, id: config.key.testnet.id, secret: config.key.testnet.secret });
 
 (async()=>{
