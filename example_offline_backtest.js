@@ -1,6 +1,15 @@
 
 
-// Offline feed of bars from a JSON file - generate this file with ./data/scrape.js
+// ********* ATTENTION *********
+//  
+// First requires generation of bar data file go to ./data/ folder and run: node scrape 1h 14 XBTUSD
+//
+// See scrape.js for more instructions, probably
+// 
+// ******************************
+
+
+// Offline feed of bars
 const DiskFeed  = require('./src/feed/Offline');
 
 const filename = `${__dirname}/data/XBTUSD-1h.json`;

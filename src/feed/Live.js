@@ -1,21 +1,27 @@
 
+//
+// Live.js 
+//           Emits live data and optionally requests recent historical bars first, too.
+//
+
 const fetch = require('node-fetch');
 const EventEmitter = require('../EventEmitter');
 const present = require('present');
 
 const BITMEX_BINS = {
-    '1m': 1 * 5000 * 60,
+    '1m': 1 * 1000 * 60,
     '5m': 5 * 1000 * 60,
     '1h': 60 * 1000 * 60,
     '1d': 24 * 60 * 1000 * 60
 };
 
+const LATENCY = 0;
 const DEF_RESOLUTION = 5 * 1000 * 60;
 const DEF_QUARTER_RES = DEF_RESOLUTION >> 2;
 const DEF_BIN = '5m';
 const DEF_SYMBOL = 'XBTUSD';
 
-const FRONT_RUN = 250;   // ... naughty naughty.
+// const LATENCY = 250;   // ... naughty naughty.
 const MAX_TRADES = 200; 
 const TRADE_COLS = JSON.stringify(["timestamp","size", "price"]);
 const API_URL = 'https://www.bitmex.com/api/v1/';
@@ -49,7 +55,7 @@ class Feed extends EventEmitter
         }
 
         let now = Date.now();
-        let remaining = (this.resolution - ( now % this.resolution )) - FRONT_RUN;
+        let remaining = (this.resolution - ( now % this.resolution )) - LATENCY;
         let showninfo = false;
 
         let warmup = options.warmup;
@@ -74,8 +80,9 @@ class Feed extends EventEmitter
             // The most recently closed bar we're looking for from bucketed trades endpoint
             let previousopentime = this.opentime - this.resolution;
 
-            // BitMEX latency when publishing complete bars is ENORMOUS
+            // BitMEX latency when publishing complete bars is E N O R M O U S
             // need to wait around 10 - 20 seconds after close until available, poll for it here:
+            // This is only needed once at startup, when running live we use a bit of a hack for instant bar close data
             for ( let t=0; t<20; t++ )
             {
                 res = await fetch(`${API_URL}/trade/bucketed?binSize=${this.bin}&partial=false&symbol=${DEF_SYMBOL}&count=1&reverse=true`);
@@ -85,7 +92,7 @@ class Feed extends EventEmitter
                     break; // we're good
  
                 if ( ! showninfo ) {
-                    console.log(`Waiting for BitMEX to publish...`);
+                    console.log(`Waiting for BitMEX to publish latest data...`);
                     showninfo = true;
                 }
 
@@ -114,7 +121,7 @@ class Feed extends EventEmitter
 
         // Recalculate in case warmup took ages...
         now = Date.now();
-        remaining = (this.resolution - ( now % this.resolution )) - FRONT_RUN;
+        remaining = (this.resolution - ( now % this.resolution )) - LATENCY;
 
         if ( !options.offline )
             setTimeout( (this.stream).bind(this), remaining );
@@ -181,16 +188,12 @@ class Feed extends EventEmitter
         this.opentime += this.resolution;
 
         let now = Date.now();
-        let remaining = (this.resolution - ( now % this.resolution )) - FRONT_RUN;
+        let remaining = (this.resolution - ( now % this.resolution )) - LATENCY;
 
-        // This line is here because, if we're front-running, then the time right now is 
-        // probably :59.750 ish, meaning there's only 250ms until the next bar which 
-        // is wrong, unless we just nudge it forward by the resolution so it's on the next bar
+        // Check previous boundary 
         if ( remaining < this.resolution4 ) remaining += this.resolution;
 
-        // console.log(`setting timeout for ${remaining} ms`);
-
-        // Reset a setTimeout each time to prevent Interval drift 
+        // Reset a setTimeout each time to mitigate setInterval() drift 
         setTimeout( (this.stream).bind(this), remaining );
         
     }
