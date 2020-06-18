@@ -15,6 +15,8 @@ class DiskFeed extends EventEmitter
 
         let bars = this.data;
 
+        options = options || {};
+
         if ( options.warmup )
             bars = this.data.slice( -options.warmup );
 
