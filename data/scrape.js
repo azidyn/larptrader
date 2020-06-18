@@ -1,4 +1,26 @@
 
+/* 
+    scrape.js
+
+        Pull historical bar/candlestick data from BitMEX 
+
+        usage: node scrape <resolution> <number_of_days_of_data> <symbol>
+
+        All parameters are optional
+
+        example:
+
+        >> node scrape 1h 30 XBTUSD
+
+        .... pulls the last 30 days of 1 hour bar data for XBTUSD 
+
+        Put in a really huge number of days to scrape all historical data
+        Warning: will take a long time for 1minute bars!
+
+        Zero error checking performed re: parameter input and api response.
+
+*/
+
 const fetch = require('node-fetch');
 const fs    = require('fs');
 
@@ -9,21 +31,6 @@ const RESOLUTIONS = {
     '1d': 24 * 60 * 1000 * 60
 };
 
-/* 
-
-    Pull historical bar/candlestick data from BitMEX 
-
-    usage: node scrape <resolution> <number_of_days_of_data> <symbol>
-
-    All parameters are optional
-
-    example:
-
-    >> node scrape 1h 30 XBTUSD
-
-    .... pulls the last 30 days of 1 hour bar data for XBTUSD 
-
-*/
 
 // options 1m, 5m, 1h, 1d
 const resolution = process.argv[2] || '1h';
@@ -49,18 +56,23 @@ let filename = `./${symbol}-${resolution}.json`;
 
     const MAX_PAGE_SIZE = 1000;
     const res_ms = RESOLUTIONS[ resolution ];
-    const now = new Date();
 
     let page_start = start;
 
     for (;;) {
         
         let url = `https://www.bitmex.com/api/v1/trade/bucketed?binSize=${resolution}&partial=false&symbol=${symbol}&count=${MAX_PAGE_SIZE}&reverse=false&startTime=${encodeURI(page_start.toISOString())}`;
+
+        console.log(`Requesting: ${url}`);
         
         let res = await fetch( url );
         let bars = await res.json();
 
-        console.log(`Requesting: ${url}`);
+        if ( !bars.length ) {
+            console.log(`No data returned.`);
+            process.exit(1);
+        }
+
         console.log(`=> Scraped ${bars.length} bars. Adding to '${filename}'. Sleeping 2.5 seconds...\n`);
 
         // Clarify timestamps
@@ -71,18 +83,19 @@ let filename = `./${symbol}-${resolution}.json`;
             b.retrievedtimestamp = b.timestamp;
             delete b.timestamp;
         }
-
+        
         historical = historical.concat( bars );
 
         fs.writeFileSync( filename, JSON.stringify( historical ) );
 
-        await delay( 2500 );
+        page_start = new Date( Date.parse( bars[ bars.length - 1 ].closetimestamp ) + res_ms );
 
-        page_start = new Date( page_start.getTime() + ( MAX_PAGE_SIZE * res_ms ) );
-
-        if ( page_start.getTime() > now.getTime() ) 
+        if ( page_start.getTime() > Date.now() ) 
             break;
- 
+
+        // Add a request delay to avoid Arthur bitchslap
+        await delay( 2500 );
+            
     }
 
 

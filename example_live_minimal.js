@@ -1,4 +1,14 @@
 
+/*
+
+    example-live-minimal.js
+
+    Pulls the last 10 bars of historical data from BitMEX and then sits waiting for new bars
+    Prints them out to the console.
+
+*/
+
+
 const fs            = require('fs');
 const LiveFeed      = require('./src/feed/Live');
 

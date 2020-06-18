@@ -4,9 +4,6 @@ const Backtester    = require('./src/Backtester');
 const fs            = require('fs');
 const Indicators    = require('technicalindicators');
 
-// Uncomment to see available indicators:
-// console.log( Indicators.AvailableIndicators )
-
 const MAX_HISTORICAL_BARS = 1000;
 
 // Settings for your backtest/trading
@@ -15,13 +12,14 @@ const RUN_LIVE = false;                 // enable live trading or not
 const HISTORICAL_BARS = 1000;           // how many bars to download before running live/backtest (max 1000)
 
 
+// Data
 const feed = new LiveFeed();
 
-// 
+// 'Backtest' the incoming data, can be used for Live or Offline bars
 const larp = new Backtester();
 
 larp.fees.on = true;
-larp.fees.side = 'makertaker';
+larp.fees.mode = 'makertaker';
 
 let series = [];
 
@@ -45,11 +43,11 @@ function onclose( bar, series )
     // Get the previous bar
     let prevbar = prev( series, 1 );
 
-    if ( !prevbar )
-        return;
-
     // Get the simple moving avg value for this bar's close
     let sma60 = sma.nextValue( bar.close );
+
+    if ( !prevbar )
+        return;
 
     // If price crossing down the 60 SMA, short
     if ( prevbar.close >= sma60 && bar.close < sma60 ) {
@@ -57,6 +55,7 @@ function onclose( bar, series )
         if ( bar.live )
             console.log( `(live) ${ bar.closetimestamp} SHORT | ${bar.close}` );
 
+        // side, price, stop, risk, time 
         larp.open( 'short', bar.close, null, 100, bar.closetimestamp );
 
     }
@@ -80,6 +79,12 @@ function onclose( bar, series )
 
 // Required system bootup boilerplate code 
 (async()=>{
+
+    feed.on('terminate', b => {
+
+        console.log('Terminated. Change    RUN_LIVE = true    to continue waiting for new data.');
+
+    });
 
     feed.on('bar', b => {
 

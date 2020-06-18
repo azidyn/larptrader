@@ -12,7 +12,7 @@
 // Offline feed of bars
 const DiskFeed  = require('./src/feed/Offline');
 
-const filename = `${__dirname}/data/XBTUSD-1h.json`;
+const filename = `${__dirname}/data/XBTUSD-1d.json`;
 
 let feed;
 
@@ -41,6 +41,6 @@ function onclose( bar )
 
     } );
 
-    await feed.start();
+    feed.start(); 
     
 })();

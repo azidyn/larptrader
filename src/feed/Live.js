@@ -124,6 +124,9 @@ class Feed extends EventEmitter
 
         if ( !options.offline )
             setTimeout( (this.stream).bind(this), remaining );
+        else
+            this.emit('terminate');
+        
 
     }
 

@@ -11,7 +11,7 @@ class Backtester
             on: true,
             taker: 0.075 / 100,         // BitMEX taker fees = 0.075%
             maker: 0.025 / 100,         // 
-            side: 'makertaker'          // 'makertaker': one of each, 'maker': limit orders both sides, 'taker': market orders both sides
+            mode: 'makertaker'          // 'makertaker': one of each, 'maker': limit orders both sides, 'taker': market orders both sides
         };
         
         this.stopped = false;
