@@ -34,7 +34,7 @@ Start with this one:
 node example_live_minimal
 ```
 
-Description of behaviour inside the source file.
+Description of behaviour inside all the source file.
 
 ### Scraping data
 
