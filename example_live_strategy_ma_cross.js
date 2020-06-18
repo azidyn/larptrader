@@ -1,3 +1,14 @@
+/*
+    
+    example_live_strategy_ma_cross.js
+
+        Demonstrates how to take live data, run it through some strategy logic and 'backtest' its performance and 
+        then continues to monitor a live price feed and apply the strategy and backtest logic 
+
+        So, a bit like a backtest followed by a forward test.
+
+*/
+
 
 const LiveFeed      = require('./src/feed/Live');
 const Backtester    = require('./src/Backtester');

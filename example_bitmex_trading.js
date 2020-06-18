@@ -3,7 +3,7 @@
 
     example_bitmex_trading.js
 
-    Shows how to execute a trade on BitMEX
+    Shows how to execute a trade on BitMEX based on live price action
 
     Note that the bar feed comes from the real/live BitMEX not testnet
 

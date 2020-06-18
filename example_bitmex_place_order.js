@@ -1,3 +1,11 @@
+/*
+
+    example_bitmex_place_order.js
+    
+        Basic demo of how to market out/in a position
+        
+*/
+
 
 
 const BitMEX = require('./exchange/BitMEX');
@@ -18,7 +26,6 @@ let bitmex = new BitMEX({ livenet: false, id: config.key.testnet.id, secret: con
     let result = await bitmex.marketorder( 'XBTUSD', 'Buy', 1 )
 
     console.log( result );
-
 
 
 })();

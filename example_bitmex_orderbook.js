@@ -1,4 +1,9 @@
-
+/*
+    example_bitmex_orderbook.js
+    
+        Pulls the testnet L2 orderbook to 5 levels.
+        
+*/
 
 const BitMEX = require('./exchange/BitMEX');
 const config = require('./config');
