@@ -7,7 +7,7 @@ module.exports = {
 
     key: {
         live:    { id: '', secret: '' },   
-        testnet: { id: 'uJsE_7wAB8_EInNBnRUqvlJR', secret: 'xelNbOtL0f3T5KRzTv69h1dUptfVQMwjJiJqdg6F257sWHBD' }     // your api keys here
+        testnet: { id: '', secret: '' }     // your api keys here
     }
 
 }
