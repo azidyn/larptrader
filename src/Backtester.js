@@ -55,7 +55,7 @@ class Backtester
             opentimestamp: timestamp,
             closetimestamp: null,
             result: { },
-            meta: { }
+            meta: { initialstop: stop }
         };
 
     }
@@ -76,6 +76,11 @@ class Backtester
 
     get lasttrade () {
         return this.trades.length ? this.trades[ this.trades.length -1 ] : null;
+    }
+
+    // At given price, closes a portion of the position (1.0 == 100%, 0.5 == 50%) using a market order
+    takeprofits( price, portion ) {
+
     }
 
     close( price, timestamp ) {
@@ -194,6 +199,8 @@ class Backtester
         this.trade = null;
 
     }
+
+
 
     _calc_pnl_xbt( side, entry, exit, size ) {
 
