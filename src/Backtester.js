@@ -52,6 +52,7 @@ class Backtester
             stop: stop,
             risk: risk,
             size: stop ? this._size_by_stop_risk( risk, price, stop ) : ( this. balance * ( risk / 100 ) ) ,
+            takeprofits: [],
             opentimestamp: timestamp,
             closetimestamp: null,
             result: { },
@@ -79,7 +80,29 @@ class Backtester
     }
 
     // At given price, closes a portion of the position (1.0 == 100%, 0.5 == 50%) using a market order
-    takeprofits( price, portion ) {
+    takeprofits( price, portion, timestamp ) {
+
+        if ( !this.trade || !this.trade.size )
+            return;
+        
+        // TODO: round()? for contracts / XBT sizing
+        let quantity = this.trade.size * portion;
+
+        this.trade.size -= quantity;
+
+        let pnl = this._calc_pnl_xbt( this.trade.side, this.trade.entry, price, quantity );
+
+        pnl -= quantity * this.fees.taker * 2;
+        
+        this.balance += pnl;
+
+        this.trade.takeprofits.push({
+            timestamp,
+            price,
+            portion,
+            size: quantity,
+            profit: pnl
+        });
 
     }
 
