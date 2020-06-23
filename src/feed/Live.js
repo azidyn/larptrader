@@ -7,6 +7,7 @@
 const fetch = require('node-fetch');
 const EventEmitter = require('../EventEmitter');
 const present = require('present');
+const fetch2 = require('./RobustRequest');
 
 const BITMEX_BINS = {
     '1m': 1 * 1000 * 60,
@@ -84,8 +85,10 @@ class Feed extends EventEmitter
             // This is only needed once at startup, when running live we use a bit of a hack for instant bar close data
             for ( let t=0; t<20; t++ )
             {
-                res = await fetch(`${API_URL}/trade/bucketed?binSize=${this.bin}&partial=false&symbol=${DEF_SYMBOL}&count=1&reverse=true`);
-                warmupbars = await res.json();
+                warmupbars = await fetch2(`${API_URL}/trade/bucketed?binSize=${this.bin}&partial=false&symbol=${DEF_SYMBOL}&count=1&reverse=true`);
+
+                // res = await fetch(`${API_URL}/trade/bucketed?binSize=${this.bin}&partial=false&symbol=${DEF_SYMBOL}&count=1&reverse=true`);
+                // warmupbars = await res.json();
 
                 if ( options.offline || ms( warmupbars[0].timestamp ) - this.resolution == previousopentime )
                     break; // we're good
@@ -98,8 +101,9 @@ class Feed extends EventEmitter
                 await delay( POLL_DELAY );
             }
 
-            res = await fetch(`${API_URL}/trade/bucketed?binSize=${this.bin}&partial=false&symbol=${DEF_SYMBOL}&count=${numbars}&reverse=true`);
-            warmupbars = await res.json();
+            // res = await fetch(`${API_URL}/trade/bucketed?binSize=${this.bin}&partial=false&symbol=${DEF_SYMBOL}&count=${numbars}&reverse=true`);
+            // warmupbars = await res.json();
+            warmupbars = await fetch2(`${API_URL}/trade/bucketed?binSize=${this.bin}&partial=false&symbol=${DEF_SYMBOL}&count=${numbars}&reverse=true`);
 
             warmupbars.reverse();
 
@@ -140,13 +144,16 @@ class Feed extends EventEmitter
             console.warn(`Warning: poll is lagging by ${n - ( this.opentime + this.resolution )}ms`)
         }
         
-        let res = await fetch(`${API_URL}/trade/bucketed?binSize=${this.bin}&partial=true&symbol=${DEF_SYMBOL}&count=2&reverse=true`);
-        let bars = await res.json();
+        let res;
+        // let res = await fetch(`${API_URL}/trade/bucketed?binSize=${this.bin}&partial=true&symbol=${DEF_SYMBOL}&count=2&reverse=true`);
+        // let bars = await res.json();
+        let bars = await fetch2(`${API_URL}/trade/bucketed?binSize=${this.bin}&partial=true&symbol=${DEF_SYMBOL}&count=2&reverse=true`);
     
         let url = `${API_URL}/trade?symbol=${DEF_SYMBOL}&columns=${TRADE_COLS}&count=${MAX_TRADES}&reverse=true`
         
-        res = await fetch(encodeURI( url ));
-        let trades = await res.json();
+        // res = await fetch(encodeURI( url ));
+        let trades = await fetch2(encodeURI( url ));
+        // let trades = await res.json();
     
         // Filter trades within the bar boundary we're looking at rn
         trades = trades.filter( t => ms(t.timestamp) >= this.opentime && ms(t.timestamp) < this.opentime + this.resolution );

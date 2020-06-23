@@ -13,7 +13,7 @@ const fs            = require('fs');
 const LiveFeed      = require('./src/feed/Live');
 
 // Settings for your backtest/trading
-const RESOLUTION = '5m';               // '1m', '5m', '1h', '1d'
+const RESOLUTION = '1m';               // '1m', '5m', '1h', '1d'
 const RUN_LIVE = true;                 // enable live feed or not (system waits for each new bar)
 const HISTORICAL_BARS = 10;            // how many bars to download before running live/backtest (max 1000)
 const MAX_HISTORICAL_BARS = 1000;
